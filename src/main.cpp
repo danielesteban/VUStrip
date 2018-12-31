@@ -88,12 +88,16 @@ void networkSetup() {
 
   // Form
   String form = (
+    "<style>"
+    "body{background:#111;color:#fff;text-align:center;margin:2rem;font-size:2rem}"
+    "button,input,select{width:200px;margin:0.5rem 0 1rem;padding:1rem 2rem;font-size:inherit}"
+    "</style>"
     "<form action=\"/\" method=\"post\">"
     "SSID:<br />"
     "<select name=\"ssid\">"
   );
-  int n = WiFi.scanNetworks();
-  for (int i = 0; i < n; i ++) {
+  const int count = WiFi.scanNetworks();
+  for (int i = 0; i < count; i ++) {
     form += "<option>" + WiFi.SSID(i) + "</option>";
   }
   form += (
