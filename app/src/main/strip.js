@@ -2,7 +2,7 @@
 
 import { ipcMain } from 'electron';
 import WebSocket from 'ws';
-global.WebSocket = WebSocket;
+global.WebSocket = WebSocket; // ugly hack for reconnecting-websocket
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 class Strip {
