@@ -9,6 +9,24 @@ const meter = new Meter(
   document.getElementById('app')
 );
 
+// Subscribe to & handle strip events
+ipcRenderer.send('Strip::Subscribe');
+ipcRenderer.on('Strip', (e, { event, ...params }) => {
+  switch (event) {
+    case 'open':
+      meter.connected = true;
+      break;
+    case 'close':
+      meter.connected = false;
+      break;
+    case 'ip':
+      meter.ip = params.ip;
+      break;
+    default:
+      break;
+  }
+});
+
 // Capture system audio
 desktopCapturer.getSources({ types: ['screen'] }, (err, sources) => {
   if (err || !sources.length) {
@@ -62,7 +80,7 @@ desktopCapturer.getSources({ types: ['screen'] }, (err, sources) => {
       });
       // Update meter & led strip
       meter.amplitude = scaled;
-      ipcRenderer.send('updateStrip', scaled);
+      ipcRenderer.send('Strip::Update', scaled);
     };
   });
 });

@@ -43,24 +43,34 @@ class Meter {
     const {
       amplitude,
       canvas,
+      connected,
       chunkCount,
       ctx,
+      ip,
     } = this;
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#111';
     ctx.fillRect(1, 1, canvas.width - 2, canvas.height - 2);
-    const chunkHeight = (canvas.height * 0.9) / chunkCount;
+    ctx.fillStyle = connected ? '#090' : '#900';
+    ctx.fillRect(1, 1, canvas.width - 2, canvas.height * 0.05);
+    ctx.fillStyle = connected ? '#eee' : '#999';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '9px Arial';
+    ctx.fillText(ip || '', canvas.width * 0.5, canvas.height * 0.03);
+    const height = canvas.height * 0.95;
+    const chunkHeight = height / (chunkCount + 2);
     const channelOffset = canvas.width / 5;
     const rect = {
       width: canvas.width / 4,
       height: chunkHeight * 0.75,
     };
     rect.x = canvas.width * 0.5 - rect.width * 0.5;
-    rect.y = canvas.height * 0.05 + chunkHeight * 0.5 - rect.height * 0.5;
+    rect.y = canvas.height - height + chunkHeight * 1.5 - rect.height * 0.5;
     for (let i = 0; i < chunkCount; i += 1) {
       ['left', 'right'].forEach((channel) => {
-        ctx.fillStyle = i < amplitude[channel] ? '#900' : '#300';
+        ctx.fillStyle = i < amplitude[channel] ? '#090' : '#333';
         ctx.fillRect(
           rect.x + channelOffset * (channel === 'left' ? 1 : -1),
           rect.y + chunkHeight * (chunkCount - 1 - i),

@@ -8,9 +8,11 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 class Strip {
   constructor(ip) {
     this.amplitude = Buffer.from([0, 0]);
+    this.subscribers = [];
     this.setIp(ip);
-    ipcMain.on('setStripIp', (e, value) => this.setIp(value));
-    ipcMain.on('updateStrip', (e, value) => this.update(value));
+    ipcMain.on('Strip::SetIp', (e, value) => this.setIp(value));
+    ipcMain.on('Strip::Update', (e, value) => this.update(value));
+    ipcMain.on('Strip::Subscribe', ({ sender }) => this.subscribe(sender));
   }
 
   connect() {
@@ -18,7 +20,14 @@ class Strip {
     this.socket = new ReconnectingWebSocket(`ws://${ip}/`);
     this.socket.addEventListener('open', () => {
       this.socket.send(amplitude, () => {});
+      this.emit({ event: 'open' });
     });
+    this.socket.addEventListener('error', () => (
+      this.emit({ event: 'close' })
+    ));
+    this.socket.addEventListener('close', () => (
+      this.emit({ event: 'close' })
+    ));
   }
 
   close() {
@@ -35,8 +44,23 @@ class Strip {
   setIp(ip) {
     const { socket } = this;
     this.ip = ip;
+    this.emit({ event: 'ip', ip });
     this.close();
     this.connect();
+  }
+
+  emit(event) {
+    const { subscribers } = this;
+    subscribers.forEach(client => (
+      client.send('Strip', event)
+    ));
+  }
+
+  subscribe(client) {
+    const { ip, socket, subscribers } = this;
+    subscribers.push(client);
+    client.send('Strip', { event: (socket && socket.readyState === WebSocket.OPEN) ? 'open' : 'close' });
+    client.send('Strip', { event: 'ip', ip });
   }
 
   update({ left, right }) {

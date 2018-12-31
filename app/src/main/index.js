@@ -7,12 +7,12 @@ import Strip from './strip';
 
 let win;
 let tray;
-const ip = process.env.IP || '192.168.1.76';
 const icon = path.join(__static, 'icon.ico');
-const strip = new Strip(ip);
+const strip = new Strip(process.env.IP || '192.168.1.76');
 const production = process.env.NODE_ENV === 'production';
 
 app.on('will-quit', () => {
+  strip.subscribers.length = 0;
   strip.close();
 });
 
@@ -33,9 +33,7 @@ app.on('ready', () => {
     win.isVisible() ? win.hide() : win.show();
   });
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: `IP: ${ip}` },
     ...(!production ? [
-      { type: 'separator' },
       {
         label: 'DevTools',
         click: () => {
