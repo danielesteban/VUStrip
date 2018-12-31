@@ -151,17 +151,20 @@ void setup() {
     request->send(404);
   });
 
+  // Wait for connection
+  uint8_t result = WiFi.waitForConnectResult();
+
   // Setup network config server if requested/unconfigured
-  delay(500);
   if (digitalRead(BUTTON_PIN) == LOW || WiFi.getMode() != WIFI_STA) {
     networkSetup();
     return;
   }
 
-  // Wait for connection
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+  // Connection failed.. Delay and restart
+  if (result != WL_CONNECTED) {
     delay(5000);
     ESP.restart();
+    return;
   }
 
   // Setup OTA updates
