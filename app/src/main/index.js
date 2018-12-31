@@ -28,6 +28,9 @@ app.on('ready', () => {
     show: false,
     skipTaskbar: true,
   });
+  win.on('close', () => {
+    app.quit();
+  });
   tray = new Tray(icon);
   tray.on('click', () => {
     win.isVisible() ? win.hide() : win.show();
@@ -46,17 +49,14 @@ app.on('ready', () => {
     { type: 'separator' },
     { label: 'Quit', role: 'quit' },
   ]));
-  win.on('close', () => {
-    app.quit();
-  });
-  if (production) {
-    win.loadURL(formatUrl({
+  win.loadURL(production ? (
+    formatUrl({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file',
       slashes: true
-    }));
-  } else {
-    win.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
-  }
+    }))
+  ) : (
+    `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
+  ));
   win.show();
 });
