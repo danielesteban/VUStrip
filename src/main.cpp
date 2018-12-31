@@ -6,7 +6,7 @@
 #define DATA_PIN 0
 #define BUTTON_PIN 2
 
-#define BRIGHTNESS 128
+#define BRIGHTNESS 96
 #define FRAMES_PER_SECOND 120
 
 struct {
@@ -43,7 +43,7 @@ void animate() {
   }
   FastLED.show();
   FastLED.delay(1000 / FRAMES_PER_SECOND);
-  EVERY_N_MILLISECONDS(10) {
+  EVERY_N_MILLISECONDS(20) {
     hue++;
   }
 }
