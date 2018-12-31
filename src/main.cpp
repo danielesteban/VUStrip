@@ -9,6 +9,9 @@
 #define BRIGHTNESS 96
 #define FRAMES_PER_SECOND 120
 
+#define NETWORK_CONFIG_AP_PASSWORD "security"
+#define OTA_AUTH_PASSWORD "security"
+
 struct {
   uint8_t left;
   uint8_t right;
@@ -72,7 +75,7 @@ void loop() {
   animate();
 }
 
-void networkSetup() {
+void setupNetworkConfig() {
   // Generate SSID
   String ssid = "strip-";
   ssid += String(ESP.getChipId(), HEX);
@@ -84,7 +87,7 @@ void networkSetup() {
   IPAddress gateway(192, 168, 1, 1);
   IPAddress subnet(255, 255, 255, 0);
   WiFi.softAPConfig(address, gateway, subnet);
-  WiFi.softAP(ssid.c_str(), "security");
+  WiFi.softAP(ssid.c_str(), NETWORK_CONFIG_AP_PASSWORD);
 
   // Form
   String form = (
@@ -123,7 +126,7 @@ void networkSetup() {
       }
     }
     if (ssid.length() && password.length()) {
-      request->send(200, "text/plain", "OK. Restarting...");
+      request->send(200);
       WiFi.persistent(true);
       WiFi.mode(WIFI_STA);
       WiFi.setSleepMode(WIFI_NONE_SLEEP);
@@ -131,44 +134,12 @@ void networkSetup() {
       WiFi.begin(ssid.c_str(), password.c_str());
       ESP.restart();
     } else {
-      request->send(200, "text/plain", "FAIL.");
+      request->send(500);
     }
   });
-
-  // Start the server
-  server.begin();
 }
 
-void setup() {
-  // Init I/O
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
-  FastLED.setBrightness(BRIGHTNESS);
-  FastLED.clear(true);
-
-  // Handle 404s
-  server.onNotFound([](AsyncWebServerRequest* request) {
-    request->send(404);
-  });
-
-  // Wait for connection
-  uint8_t result = WiFi.waitForConnectResult();
-
-  // Setup network config server if requested/unconfigured
-  if (digitalRead(BUTTON_PIN) == LOW || WiFi.getMode() != WIFI_STA) {
-    networkSetup();
-    return;
-  }
-
-  // Connection failed.. Delay and restart
-  if (result != WL_CONNECTED) {
-    delay(5000);
-    ESP.restart();
-    return;
-  }
-
-  // Setup OTA updates
-  ArduinoOTA.setPassword("security");
+void setupOTA() {
   ArduinoOTA.onStart([]() {
     FastLED.clear(true);
   });
@@ -184,10 +155,46 @@ void setup() {
       hue++;
     }
   });
+  ArduinoOTA.setPassword(OTA_AUTH_PASSWORD);
   ArduinoOTA.begin();
+}
+
+void setup() {
+  // Init I/O
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.clear(true);
+
+  // Wait for connection
+  // This also serves as an extra delay for the user to
+  // press the button to request the network config
+  uint8_t result = WiFi.waitForConnectResult();
+
+  if (digitalRead(BUTTON_PIN) == LOW || WiFi.getMode() != WIFI_STA) {
+    // Setup network config server if requested/unconfigured
+    setupNetworkConfig();
+  } else {
+    // Connection failed.. Delay and restart
+    if (result != WL_CONNECTED) {
+      delay(5000);
+      ESP.restart();
+      return;
+    }
+
+    // Setup OTA updates
+    setupOTA();
+
+    // Setup WS endpoint
+    ws.onEvent(onWsEvent);
+    server.addHandler(&ws);
+  }
+
+  // Handle 404s
+  server.onNotFound([](AsyncWebServerRequest* request) {
+    request->send(404);
+  });
 
   // Start the server
-  ws.onEvent(onWsEvent);
-  server.addHandler(&ws);
   server.begin();
 }
