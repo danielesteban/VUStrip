@@ -1,0 +1,4 @@
+.pioenvs
+.piolibdeps
+dist
+node_modules
