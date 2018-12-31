@@ -29,7 +29,7 @@ void animate() {
       const int to = map(amplitude.left, 0, 0xFF, 0, mid);
       const int from = max(to - (NUM_LEDS / 5), 0);
       for (int i = from; i < to; i++) {
-        leds[i] = CHSV(hue + (i - from) * 2, 255, 192);
+        leds[i] = CHSV((hue + (i - from) * 2) % 0xFF, 255, 192);
       }
     }
     {
@@ -37,7 +37,7 @@ void animate() {
       const int to = map(amplitude.right, 0, 0xFF, 0, mid);
       const int from = max(to - (NUM_LEDS / 5), 0);
       for (int i = from; i < to; i++) {
-        leds[NUM_LEDS - 1 - i] = CHSV(hue + (i - from) * 2, 255, 192);
+        leds[NUM_LEDS - 1 - i] = CHSV((hue + 128 + (i - from) * 2) % 0xFF, 255, 192);
       }
     }
   }
