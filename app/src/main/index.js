@@ -29,6 +29,9 @@ app.on('ready', () => {
     skipTaskbar: true,
   });
   tray = new Tray(icon);
+  tray.on('click', () => {
+    win.isVisible() ? win.hide() : win.show();
+  });
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: `IP: ${ip}` },
     ...(!production ? [
@@ -45,15 +48,6 @@ app.on('ready', () => {
     { type: 'separator' },
     { label: 'Quit', role: 'quit' },
   ]));
-  tray.on('click', () => {
-    win.isVisible() ? win.hide() : win.show();
-  });
-  win.on('show', () => {
-    tray.setHighlightMode('always');
-  });
-  win.on('hide', () => {
-    tray.setHighlightMode('never');
-  });
   win.on('close', () => {
     app.quit();
   });
