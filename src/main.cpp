@@ -21,7 +21,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/");
 
 void animate() {
-  fadeToBlackBy(leds, NUM_LEDS, enabled ? 40 : 20);
+  fadeToBlackBy(leds, NUM_LEDS, 40);
   if (enabled) {
     const int mid = NUM_LEDS / 2;
     {
