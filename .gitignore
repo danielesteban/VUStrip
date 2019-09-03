@@ -1,5 +1,3 @@
 .pio
 dist
 node_modules
-mobile/platforms
-mobile/plugins
