@@ -8,7 +8,7 @@ import Strip from './strip';
 let win;
 let tray;
 const icon = path.join(__static, 'icon.ico');
-const strip = new Strip(process.env.IP || '192.168.1.76');
+const strip = new Strip(process.env.IP || '192.168.1.75');
 const production = process.env.NODE_ENV === 'production';
 
 app.on('will-quit', () => {
@@ -27,6 +27,7 @@ app.on('ready', () => {
     transparent: true,
     show: false,
     skipTaskbar: true,
+    webPreferences: { nodeIntegration: true },
   });
   win.on('close', () => {
     app.quit();

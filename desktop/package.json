@@ -9,14 +9,14 @@
     "start": "electron-webpack dev"
   },
   "dependencies": {
-    "reconnecting-websocket": "^4.1.10",
-    "source-map-support": "^0.5.9",
-    "ws": "^6.1.2"
+    "reconnecting-websocket": "^4.2.0",
+    "source-map-support": "^0.5.13",
+    "ws": "^7.1.2"
   },
   "devDependencies": {
-    "electron": "^4.0.0",
-    "electron-builder": "^20.38.4",
-    "electron-webpack": "^2.6.1",
-    "webpack": "^4.28.3"
+    "electron": "^6.0.7",
+    "electron-builder": "^21.2.0",
+    "electron-webpack": "^2.7.4",
+    "webpack": "^4.39.3"
   }
 }

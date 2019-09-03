@@ -36,13 +36,17 @@ desktopCapturer.getSources({ types: ['screen'] }, (err, sources) => {
     mandatory: {
       chromeMediaSource: 'desktop',
       chromeMediaSourceId: sources[0].id,
+      minWidth: 1,
+      minHeight: 1,
+      maxWidth: 1,
+      maxHeight: 1,
     },
   };
   navigator.mediaDevices.getUserMedia({
     audio: source,
     video: source,
   }).then((stream) => {
-    const player = document.createElement('video');
+    const player = document.createElement('audio');
     player.srcObject = stream;
     player.onloadedmetadata = () => {
       player.play();

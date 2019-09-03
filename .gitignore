@@ -1,5 +1,4 @@
-.pioenvs
-.piolibdeps
+.pio
 dist
 node_modules
 mobile/platforms
