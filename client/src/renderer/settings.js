@@ -10,6 +10,7 @@ class Settings {
     div.style.top = '84px';
     div.style.left = '64px';
     div.style.width = '192px';
+    div.style.display = 'none';
     const form = document.createElement('form');
     form.style.display = 'flex';
     form.style.alignItems = 'center';
@@ -29,8 +30,15 @@ class Settings {
     form.addEventListener('submit', this.onSubmit.bind(this), false);
     div.appendChild(form);
     mount.appendChild(div);
+    this.div = div;
     this.input = input;
     this.onUpdate = onUpdate;
+    window.addEventListener('resize', this.onResize.bind(this));
+  }
+
+  onResize() {
+    const { div } = this;
+    div.style.display = (window.innerWidth < 256) ? 'none' : '';
   }
 
   onSubmit(e) {

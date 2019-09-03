@@ -80,5 +80,4 @@ app.on('ready', () => {
   ) : (
     `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
   ));
-  win.show();
 });

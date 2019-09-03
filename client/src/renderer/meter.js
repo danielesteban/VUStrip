@@ -8,7 +8,7 @@ class Meter {
     this.canvas.style.left = '0';
     this.canvas.style.verticalAlign = 'middle';
     this.canvas.style.webkitAppRegion = 'drag';
-    this.canvas.width = 64; // window.innerWidth;
+    this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     mount.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d');
