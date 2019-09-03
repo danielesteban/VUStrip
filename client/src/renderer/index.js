@@ -2,12 +2,26 @@
 
 import { desktopCapturer, ipcRenderer } from 'electron';
 import Meter from './meter';
+import Settings from './settings';
+
+// Main Styles
+document.body.style.background = '#111';
+document.body.style.overflow = 'hidden';
 
 // Amplitude meter
-document.body.style.background = '#111';
 const meter = new Meter(
   document.getElementById('app')
 );
+
+// Settings
+const settings = new Settings({
+  mount: document.getElementById('app'),
+  onUpdate: ({ ip }) => {
+    localStorage.setItem('VUStrip::Settings', JSON.stringify({ ip }));
+    ipcRenderer.send('Strip::SetIp', ip);
+    ipcRenderer.send('Settings::Toggle');    
+  }
+});
 
 // Subscribe to & handle strip events
 ipcRenderer.send('Strip::Subscribe');
@@ -21,11 +35,26 @@ ipcRenderer.on('Strip', (e, { event, ...params }) => {
       break;
     case 'ip':
       meter.ip = params.ip;
+      settings.input.value = params.ip;
       break;
     default:
       break;
   }
 });
+
+// Load stored settings
+{
+  const stored = localStorage.getItem('VUStrip::Settings');
+  if (stored) {
+    let settings;
+    try {
+      settings = JSON.parse(stored);
+    } catch (e) {}
+    if (settings && settings.ip) {
+      ipcRenderer.send('Strip::SetIp', settings.ip);
+    }
+  }
+}
 
 // Capture system audio
 desktopCapturer.getSources({ types: ['screen'] }, (err, sources) => {

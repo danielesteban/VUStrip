@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, Menu, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
 import Strip from './strip';
@@ -10,6 +10,21 @@ let tray;
 const icon = path.join(__static, 'icon.ico');
 const strip = new Strip(process.env.IP || '192.168.1.75');
 const production = process.env.NODE_ENV === 'production';
+
+const toggleSettings = () => {
+  if (!win) {
+    return;
+  }
+  const size = win.getSize();
+  const width = size[0] === 64 ? 256 : 64;
+  const height = 256;
+  win.setMinimumSize(width, height);
+  win.setSize(width, height);
+  if (!win.isVisible()) {
+    win.show();
+  }
+};
+ipcMain.on('Settings::Toggle', toggleSettings);
 
 app.on('will-quit', () => {
   strip.subscribers.length = 0;
@@ -23,6 +38,8 @@ app.on('ready', () => {
     height: 256,
     alwaysOnTop: true,
     frame: false,
+    maximizable: false,
+    minimizable: false,
     resizable: false,
     transparent: true,
     show: false,
@@ -47,6 +64,10 @@ app.on('ready', () => {
         },
       },
     ] : []),
+    {
+      label: 'Settings',
+      click: toggleSettings,
+    },
     { type: 'separator' },
     { label: 'Quit', role: 'quit' },
   ]));
