@@ -11,7 +11,7 @@
   "dependencies": {
     "reconnecting-websocket": "^4.2.0",
     "source-map-support": "^0.5.13",
-    "ws": "^7.1.2"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "electron": "^6.0.7",
